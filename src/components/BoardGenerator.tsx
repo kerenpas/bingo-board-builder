@@ -8,14 +8,24 @@ import { Printer } from 'lucide-react';
 
 interface BoardGeneratorProps {
   words: string[];
+  onWordsChange?: (words: string[]) => void;
 }
 
-const BoardGenerator: React.FC<BoardGeneratorProps> = ({ words }) => {
+const BoardGenerator: React.FC<BoardGeneratorProps> = ({ words, onWordsChange }) => {
   const [boards, setBoards] = useState<string[][][]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
   const handleGenerate = () => {
+    if (words.length < 9) {
+      toast({
+        title: "לא מספיק מילים",
+        description: "נדרשות לפחות 9 מילים ליצירת לוח בינגו 3x3",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
     
     // Simulate a short delay to show the loading effect
@@ -52,9 +62,11 @@ const BoardGenerator: React.FC<BoardGeneratorProps> = ({ words }) => {
     window.print();
   };
 
-  // Generate boards on mount
+  // Generate boards when words change or on mount
   useEffect(() => {
-    handleGenerate();
+    if (words.length >= 9) {
+      handleGenerate();
+    }
   }, []);
 
   return (
